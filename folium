@@ -1,0 +1,13 @@
+import folium
+from streamlit_folium import st_folium
+
+def render_map(data):
+    st.subheader("Interactive Map Intelligence")
+    # Initialize map at a default location or calculate from data
+    m = folium.Map(location=[0, 0], zoom_start=2)
+    
+    # Add GeoJSON layer from your uploaded file
+    folium.GeoJson(data, name="User Uploaded Map").add_to(m)
+    
+    # Display in Streamlit
+    st_folium(m, width=700, height=500)

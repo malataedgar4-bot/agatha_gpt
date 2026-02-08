@@ -1,1 +1,49 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# AGATHA x MAIZY: Complete Requirements
+# Core Dependencies for U-D GPT Navigator
+# Python 3.8+
+# ═══════════════════════════════════════════════════════════════════════════
+
+# --- CORE FRAMEWORK ---
+streamlit==1.35.0                    # Web app framework
+streamlit-chat==0.1.1                # Chat UI components (optional but recommended)
+
+# --- LANGCHAIN ECOSYSTEM (YOUR CORE STACK) ---
+langchain==0.1.14                    # LLM orchestration framework
+langchain-core==0.1.48               # Core LangChain utilities
+langchain-community==0.0.38          # Community integrations
+langchain-huggingface==0.0.42        # HuggingFace integration for embeddings
+langchain-groq==0.1.2                # Groq LLM integration (your main LLM)
+
+# --- VECTOR STORE & EMBEDDINGS (RAG) ---
+faiss-cpu==1.7.4                     # Facebook AI Similarity Search (CPU version)
+sentence-transformers==2.2.2         # Embedding models from HuggingFace
+huggingface-hub==0.21.4              # HuggingFace model downloading & management
+
+# --- TEXT-TO-SPEECH ---
+gtts==2.4.0                          # Google Text-to-Speech (your TTS engine)
+pydub==0.25.1                        # Audio file handling
+
+# --- DATA PROCESSING & ML ---
+numpy==1.24.3                        # Numerical computing
+pandas==2.0.3                        # Data manipulation
+scikit-learn==1.3.1                  # ML utilities
+
+# --- HTTP & API COMMUNICATION ---
+requests==2.31.0                     # HTTP library
+aiohttp==3.9.0                       # Async HTTP client
+urllib3==2.1.0                       # HTTP utilities
+
+# --- UTILITIES & CORE ---
+python-dotenv==1.0.0                 # Environment variable management
+pydantic==2.5.0                      # Data validation
+typing-extensions==4.8.0             # Type hints compatibility
 streamlit
+requests
+pandas
+folium
+streamlit-folium
+# ═══════════════════════════════════════════════════════════════════════════
+# INSTALLATION:
+# pip install -r requirements.txt
+# ═══════════════════════════════════════════════════════════════════════════
