@@ -1,98 +1,100 @@
 import streamlit as st
-import folium
-from streamlit_folium import st_folium
 
-# 1. ELITE PAGE SETUP
+# 1. ELITE CONFIG
 st.set_page_config(page_title="Agatha U-D GPT", page_icon="🛰️", layout="centered")
 
-# 2. CSS KILL-SWITCH (Zero 'Ugly' Boxes) [cite: 2026-02-06, 2026-02-10]
+# 2. CSS KILL-SWITCH (Clean, Professional Dark Mode)
 st.markdown("""
     <style>
     .stApp { background-color: #0d1117; color: #ffffff; }
     header, footer, .stExpander { visibility: hidden !important; display: none !important; }
     .agatha-bubble {
         background: #161b22; padding: 25px; border-radius: 15px;
-        border: 1px solid #30363d; color: #e6edf3; margin-bottom: 20px;
+        border-left: 5px solid #58a6ff; color: #e6edf3; margin-bottom: 20px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
     .user-msg { color: #58a6ff; font-weight: bold; margin-bottom: 5px; }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. POLYGLOT KNOWLEDGE DATABASE [cite: 2026-02-06]
-# Intelligence covers: Admin, Chain of Command, Offices, Hostels, Cafes, Rooms, Emergency
-KNOWLEDGE = {
-    "admin": {
-        "en": "UDSM Chain of Command: 1. Chancellor (Titular Head), 2. Vice-Chancellor (Chief Executive), 3. Deputy Vice-Chancellors (Academic and PFA).",
-        "sw": "Uongozi wa UDSM: 1. Kansela (Mkuu wa Heshima), 2. Makamu wa Kansela (Mtendaji Mkuu), 3. Naibu Makamu wa Kansela (Taaluma na PFA)."
-    },
+# 3. QUADRILINGUAL KNOWLEDGE VAULT (Admin, Hostels, Medical, Study)
+VAULT = {
     "vc": {
-        "en": "The Vice-Chancellor is Prof. William Anangisye. He oversees all university operations.",
-        "sw": "Makamu wa Kansela ni Prof. William Anangisye. Anasimia shughuli zote za chuo."
+        "en": "The Vice-Chancellor is Prof. William Anangisye, the chief executive officer of UDSM.",
+        "sw": "Makamu wa Kansela ni Prof. William Anangisye, mtendaji mkuu wa UDSM.",
+        "zh": "副校长是 William Anangisye 教授，达累斯萨拉姆大学的首席执行官。",
+        "ar": "نائب المستشار هو الأستاذ ويليام أنانيسي، الرئيس التنفيذي لجامعة دار السلام."
     },
-    "chancellor": {
-        "en": "The Chancellor is Dr. Jakaya Mrisho Kikwete, the former President of Tanzania.",
-        "sw": "Kansela ni Dr. Jakaya Mrisho Kikwete, Rais mstaafu wa Tanzania."
-    },
-    "offices": {
-        "en": "Main administration offices are located in the Administration Block near the main entrance.",
-        "sw": "Ofisi kuu za utawala zipo jengo la Utawala (Admin Block) karibu na geti kuu."
+    "admin": {
+        "en": "UDSM Chain of Command: Chancellor (Dr. Kikwete), Vice-Chancellor (Prof. Anangisye), and Deputy Vice-Chancellors.",
+        "sw": "Uongozi wa UDSM: Kansela (Dr. Kikwete), Makamu wa Kansela (Prof. Anangisye), na Manaibu wake.",
+        "zh": "学校领导层：校监（Kikwete 博士）、副校长（Anangisye 教授）及各副职。",
+        "ar": "الهيكل الإداري: المستشار (د. كيكويت)، ونائب المستشار (أ.د. أنانيسي)، ونوابه."
     },
     "hostels": {
-        "en": "Hostels include Hall 1-6 (Main Campus), Mabibo Hostels, and Dr. John Joseph Pombe Magufuli Hostels.",
-        "sw": "Hosteli ni pamoja na Hall 1-6 (Kampasi Kuu), Hosteli za Mabibo, na Hosteli za Dr. John Joseph Pombe Magufuli."
+        "en": "UDSM offers various student hostels including Hall 1-6, Mabibo, and Dr. J.P. Magufuli hostels.",
+        "sw": "UDSM inatoa hosteli mbalimbali ikiwemo Hall 1-6, Mabibo, na hosteli za Dr. J.P. Magufuli.",
+        "zh": "大学提供多种宿舍，包括 Hall 1-6、Mabibo 以及 Magufuli 博士宿舍。",
+        "ar": "توفر الجامعة سكناً طلابياً متنوعاً يشمل Hall 1-6، مابيبو، وسكن الدكتور ماغوفولي."
     },
-    "hall 1": {"info": "Hall 1: Primary male hostel near Admin.", "lat": -6.7800, "lon": 39.2030},
-    "hall 5": {"info": "Hall 5: Female hostel near Health Centre.", "lat": -6.7820, "lon": 39.2120},
-    "cafes": {
-        "en": "Major cafes: Mlimani Main Cafeteria, CoET Cafe, and various vendors at Yombo and UDBS.",
-        "sw": "Migahawa mikuu: Mlimani Main Cafeteria, CoET Cafe, na vibanda vya Yombo na UDBS."
-    },
-    "yombo": {"info": "Yombo: Largest complex for lecture rooms and exam halls.", "lat": -6.7845, "lon": 39.2065},
-    "health": {"info": "UDSM Health Centre: Medical and Emergency services near the main gate.", "lat": -6.7815, "lon": 39.2100},
     "emergency": {
-        "en": "EMERGENCY: Contact UDSM Health Centre or Campus Security immediately.",
-        "sw": "DHARURA: Wasiliana na Kituo cha Afya cha UDSM au Ulinzi wa Kampasi haraka."
+        "en": "For medical emergencies, visit the UDSM Health Centre near the main gate.",
+        "sw": "Kwa dharura ya matibabu, fika Kituo cha Afya cha UDSM karibu na geti kuu.",
+        "zh": "如有医疗紧急情况，请前往校门附近的达大健康中心。",
+        "ar": "في حالات الطوارئ الطبية، يرجى زيارة المركز الصحي بالجامعة بالقرب من البوابة الرئيسية."
+    },
+    "library": {
+        "en": "The Dr. Wilbert Chagula Library is the primary research facility on the main campus.",
+        "sw": "Maktaba ya Dr. Wilbert Chagula ndicho kituo kikuu cha utafiti kampasi kuu.",
+        "zh": "Wilbert Chagula 博士图书馆是主校区的主要研究设施。",
+        "ar": "مكتبة الدكتور ويلبرت تشاغولا هي مرفق البحث الرئيسي في الحرم الجامعي."
     }
 }
 
-# 4. SIDEBAR SETTINGS [cite: 2026-02-06, 2026-02-07]
+# 4. QUADRILINGUAL SIDEBAR
 with st.sidebar:
-    st.title("🛰️ Agatha Settings")
-    lang_choice = st.radio("Language / Lugha", ["English", "Kiswahili"])
-    l_key = "en" if lang_choice == "English" else "sw"
-    voice_on = st.toggle("Voice Assistance / Sauti")
-    if st.button("Reset Chat"):
-        st.rerun()
+    st.title("🛰️ Agatha Translator")
+    lang_choice = st.radio("Select Language / 选择语言 / اختر اللغة", ["English", "Kiswahili", "Chinese", "Arabic"])
+    
+    # Mapping keys
+    lang_map = {"English": "en", "Kiswahili": "sw", "Chinese": "zh", "Arabic": "ar"}
+    l_key = lang_map[lang_choice]
+    
+    voice_on = st.toggle("Voice Assistance")
 
 # 5. INTERFACE
 st.title("🛰️ Agatha U-D GPT")
-intro = "I am Agatha. Ask me about UDSM's command, hostels, cafes, or emergency services." if l_key == "en" else "Mimi ni Agatha. Niulize kuhusu uongozi wa UDSM, hosteli, migahawa, au dharura."
-st.markdown(f"<div class='agatha-bubble'>{intro}</div>", unsafe_allow_html=True)
+intros = {
+    "en": "I am Agatha. How may I assist you with University information?",
+    "sw": "Mimi ni Agatha. Nikusaidie nini kuhusu taarifa za Chuo?",
+    "zh": "我是 Agatha。我能为您提供哪些关于大学的信息？",
+    "ar": "أنا أجاثا. كيف يمكنني مساعدتك في الحصول على معلومات الجامعة؟"
+}
+st.markdown(f"<div class='agatha-bubble'>{intros[l_key]}</div>", unsafe_allow_html=True)
 
-# 6. POLYGLOT CHAT LOGIC
+# 6. SEARCH LOGIC
 user_query = st.chat_input("Message Agatha...")
 
 if user_query:
     st.markdown(f"<div class='user-msg'>You: {user_query}</div>", unsafe_allow_html=True)
     q = user_query.lower()
-    response = "I am scanning... try 'VC', 'Hostels', or 'Yombo'." if l_key == "en" else "Natafuta... jaribu 'VC', 'Hosteli', au 'Yombo'."
-    map_data = None
-
-    for key, data in KNOWLEDGE.items():
+    
+    # Default Not Found
+    nf = {
+        "en": "Information not found. Please try 'VC', 'Admin', or 'Emergency'.",
+        "sw": "Taarifa haijapatikana. Jaribu 'VC', 'Admin', au 'Dharura'.",
+        "zh": "未找到信息。请尝试搜索 'VC'、'Admin' 或 'Emergency'。",
+        "ar": "لم يتم العثور على المعلومات. يرجى تجربة 'VC' أو 'Admin' أو 'Emergency'."
+    }
+    response = nf[l_key]
+    
+    for key in VAULT:
         if key in q:
-            if "lat" in str(data): # Map data
-                response, map_data = data["info"], data
-            else: # Multilingual text
-                response = data[l_key]
+            response = VAULT[key][l_key]
             break
-
+            
     st.markdown(f"<div class='agatha-bubble'>{response}</div>", unsafe_allow_html=True)
 
-    if map_data:
-        m = folium.Map(location=[map_data["lat"], map_data["lon"]], zoom_start=17, tiles="CartoDB dark_matter")
-        folium.Marker([map_data["lat"], map_data["lon"]], popup=response).add_to(m)
-        st_folium(m, width=700, height=300)
-
     if voice_on:
-        st.toast("🔊 Agatha speaking..." if l_key == "en" else "🔊 Agatha anaongea...")
+        st.toast("🔊 Agatha speaking...")
+
