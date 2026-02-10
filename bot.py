@@ -1,101 +1,87 @@
 import streamlit as st
-import requests
-import json
-import streamlit as st
 import folium
 from streamlit_folium import st_folium
 
-st.title("Agatha U-D GPT 🛰️")
-st.subheader("UDSM Campus Navigator")
+# 1. PAGE CONFIG
+st.set_page_config(page_title="Agatha U-D GPT", page_icon="🛰️", layout="centered")
 
-# Language Toggle
-lang = st.sidebar.radio("Chagua Lugha / Select Language", ["Kiswahili", "English"])
+# 2. THE DARK LOOK: CSS STYLING
+st.markdown("""
+    <style>
+    .stApp { background-color: #0e1117; color: #ffffff; }
+    .chat-wrapper { max-width: 850px; margin: auto; padding-top: 50px; }
+    .agatha-msg {
+        background-color: #1e2530; padding: 20px; border-radius: 15px;
+        border-left: 4px solid #4a90e2; margin-bottom: 25px;
+        font-size: 18px; line-height: 1.6; color: #e6edf3 !important;
+    }
+    section[data-testid="stSidebar"] { background-color: #161b22 !important; }
+    h1, h2, h3, p, span, stMarkdown { color: #e6edf3 !important; }
+    </style>
+    """, unsafe_allow_html=True)
 
-# Voice Toggle
-voice = st.sidebar.checkbox("Voice Assistance (Agatha)")
-
-# UDSM Map Logic
-m = folium.Map(location=[-6.7797, 39.2040], zoom_start=15)
-folium.Marker([-6.7797, 39.2040], popup="UDSM Main Campus", tooltip="Hapa ni Mlimani").add_to(m)
-
-st_folium(m, width=700)
-
-if lang == "Kiswahili":
-    st.write("Karibu! Mimi ni Agatha. Nitakusaidia kufika unapoenda.")
-else:
-    st.write("Welcome! I am Agatha. I will help you find your destination.")
-
-# Load API keys from Streamlit secrets
-API_KEY = st.secrets['https://api.render.com/deploy/srv-d64ani4r85hc73bogtm0?key=GBsmPegI4Gk]
-
-# Multilingual support
-# Expanded Language Support for Agatha
-SUPPORTED_LANGUAGES = {
-    'en': 'English', 
-    'sw': 'Kiswahili', 
-    'zh': 'Chinese (中文)',
-    'ar': 'Arabic (العربية)',
-    'pt': 'Portuguese',
-    'hi': 'Hindi (हिन्दी)',
-    'ja': 'Japanese (日本語)',
-    'fr': 'French', 
-    'es': 'Spanish'
+# 3. KNOWLEDGE BASE
+KNOWLEDGE_IQ = {
+    "council": "Judge (Rtd) Damian Lubuva chairs the University Council.",
+    "chancellor": "Dr. Jakaya Kikwete is the Chancellor.",
+    "vc": "Prof. William Anangisye is the Vice-Chancellor.",
+    "academic": "Prof. Bonaventure Rutinwa (DVC-Academic) oversees research.",
+    "finance": "Prof. Bernadeta Killian (DVC-PFA) manages resources.",
+    "hall 1": "Hall 1 is near the main administration area.",
+    "hall 3": "Hall 3 is located near the Yombo complex.",
+    "coict": "The College of ICT is located at the Kijitonyama Campus.",
+    "library": "The Dr. Wilbert Chagula Library is at the campus center.",
+    "health": "The University Health Centre is near the main gate."
 }
-def get_response_from_api(user_input, language):
-    headers = {'Authorization': f'Bearer {API_KEY}', 'Content-Type': 'application/json'}
-    payload = json.dumps({'input': user_input, 'language': language})
-    response = requests.post('https://api.example.com/process', headers=headers, data=payload)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        st.error(f'Error fetching data: {response.status_code} {response.text}')
-        return None
 
-# Enhanced RAG pipeline (Retrieval-Augmented Generation)
-def rag_pipeline(user_query):
-    # Add logic for retrieving relevant information and generating responses
-    pass  # Placeholder for the RAG implementation
+# 4. SIDEBAR & VOICE SETTINGS
+with st.sidebar:
+    st.markdown("### Agatha Core")
+    lang = st.selectbox("Language / Lugha", ["English", "Kiswahili", "Chinese", "French"])
+    voice_on = st.toggle("Voice Assistance")
+    st.divider()
+    st.markdown("U-D GPT: Elite Edition")
 
-# Main Streamlit app
-def main():
-    st.title('Multilingual Bot')
-    language = st.selectbox('Choose your language:', list(SUPPORTED_LANGUAGES.keys()))
-    user_input = st.text_input('Enter your query:')
-    if st.button('Submit') and user_input:
-        response = get_response_from_api(user_input, language)
-        if response:
-            st.write(response['output'])
+# 5. THE INTERFACE FLOW
+st.markdown("<div class='chat-wrapper'>", unsafe_allow_html=True)
+st.title("🛰️ Agatha U-D GPT")
 
-if __name__ == '__main__':
-    main()import pandas as pd
-import json
+welcome_text = {
+    "English": "I'm Agatha. Ask me anything about UDSM's leadership or campus infrastructure.",
+    "Kiswahili": "Mimi ni Agatha. Niulize lolote kuhusu uongozi wa UDSM au miundombinu ya kampasi.",
+    "Chinese": "我是艾格峰。询问我有关 UDSM 领导层或校园基础设施的任何信息。",
+    "French": "Je suis Agatha. Posez-moi des questions sur la direction ou l'infrastructure de l'UDSM."
+}
+st.markdown(f"<div class='agatha-msg'>{welcome_text[lang]}</div>", unsafe_allow_html=True)
 
-# Handle the uploaded files
-if uploaded_files:
-    for uploaded_file in uploaded_files:
-        if uploaded_file.name.endswith('.json') or uploaded_file.name.endswith('.geojson'):
-            # Load Map Data into memory
-            map_data = json.load(uploaded_file)
-            st.success(f"Map '{uploaded_file.name}' loaded into Agatha's memory.")
-            # Visualize the map
-            render_map(map_data)
-            
-        elif uploaded_file.name.endswith('.csv'):
-            df = pd.read_csv(uploaded_file)
-            st.dataframe(df.head()) # Preview the data
-            st.success(f"Data from {uploaded_file.name} indexed.")import pandas as pd
-import json
-import os
+# Quick Info & Map
+col1, col2 = st.columns(2)
+with col1:
+    with st.expander("🎓 Institutional IQ"):
+        st.write("**VC:** Prof. William Anangisye")
+        st.write("**Council:** Judge Damian Lubuva")
+with col2:
+    with st.expander("📍 Geospatial View"):
+        m = folium.Map(location=[-6.7828, 39.2045], zoom_start=16, tiles="CartoDB dark_matter")
+        folium.Marker([-6.7828, 39.2045], popup="Admin Block").add_to(m)
+        st_folium(m, width=350, height=250)
 
-def rag_pipeline(user_query):
-    # Agatha looks for the files you uploaded to GitHub
-    # Let's assume you uploaded 'map_data.geojson'
-    file_path = 'map_data.geojson' 
+# 6. CHAT LOGIC
+user_query = st.chat_input("Ask about leaders, offices, or campus locations...")
+
+if user_query:
+    st.markdown(f"**You:** {user_query}")
+    query = user_query.lower()
     
-    if os.path.exists(file_path):
-        with open(file_path, 'r') as f:
-            data = json.load(f)
-            # Short, precise logic:
-            return f"Agatha Memory: Found map data with {len(data['features'])} locations. How can I help with these?"
-    else:
-        return "Agatha: I can't see the files yet. Ensure they are in the root folder of your GitHub repo."
+    response = "I am processing that. Try asking about the 'VC', 'Council', or 'Hall 3'."
+    for key, info in KNOWLEDGE_IQ.items():
+        if key in query:
+            response = info
+            break
+    
+    st.markdown(f"<div class='agatha-msg'>{response}</div>", unsafe_allow_html=True)
+
+    if voice_on:
+        st.info("Voice Assistant is Active. (Agatha is speaking...)")
+
+st.markdown("</div>", unsafe_allow_html=True)
