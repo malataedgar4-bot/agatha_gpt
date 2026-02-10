@@ -30,4 +30,8 @@
   "forwardPorts": [
     8501
   ]
+}{
+  "name": "Agatha GPT Engine",
+  "forwardPorts": [8501],
+  "postStartCommand": "pip install streamlit folium streamlit-folium && streamlit run bot.py"
 }
